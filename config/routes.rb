@@ -4,15 +4,37 @@ Rails.application.routes.draw do
   post '/login', to: 'sessions#create', as: 'register'
   delete '/logout', to: 'sessions#destroy', as: 'logout'
 
-  resources :merchants do
-    resources :items, only: [:index, :new, :create, :update]
-  end
+  # resources :merchants do
+  #   resources :items, only: [:index, :new, :create, :update]
+  # end
 
-  resources :items, only: [:index, :show] do
-    resources :reviews, only: [:new, :create]
-  end
+  get '/merchants/:merchant_id/items', to: 'items#index', as: 'merchant_items'
+  post '/merchants/:merchant_id/items', to: 'items#create'
+  get '/merchants/:merchant_id/items/new', to: 'items#new'
+  patch '/merchants/:merchant_id/items/:id', to: 'items#update'
+  # post '/merchants/:merchant_id/items/:id', to: 'items#update'
 
-  resources :reviews, only: [:edit, :update, :destroy]
+  get '/merchants', to: 'merchants#index'
+  post '/merchants', to: 'merchants#create'
+  get '/merchants/new', to: 'merchants#new'
+  get 'merchants/:id/edit', to: 'merchants#edit'
+  get 'merchants/:id', to: 'merchants#show'
+  patch 'merchants/:id', to: 'merchants#update'
+  delete 'merchants/:id', to: 'merchants#destroy'
+  #
+  # resources :items, only: [:index, :show] do
+  #   resources :reviews, only: [:new, :create]
+  # end
+  post '/items/:item_id/reviews', to: 'reviews#create', as: 'item_reviews'
+  get '/items/:item_id/reviews/new', to: 'reviews#new', as: 'new_item_review'
+
+  get '/items', to: 'items#index', as: 'items'
+  get '/items/:id', to: 'items#show', as: 'item'
+
+  # resources :reviews, only: [:edit, :update, :destroy]
+  get '/reviews/:id/edit', to: 'reviews#edit', as: 'edit_review'
+  patch '/reviews/:id', to: 'reviews#update'
+  delete '/reviews/:id', to: 'reviews#destroy', as: 'review'
 
   get '/cart', to: 'cart#show', as: 'cart'
 	post '/cart/:item_id', to: 'cart#add_item', as: 'add_to_cart'
@@ -20,10 +42,20 @@ Rails.application.routes.draw do
   patch '/cart/:change/:item_id', to: 'cart#update_quantity', as: 'update_cart'
   delete '/cart/:item_id', to: 'cart#remove_item', as: 'remove_item'
 
-  get '/register/new', to: 'users#new', as: :new_user
-  resources :users, only: [:create, :show, :edit, :update] do
-  	resources :orders, only: [:create, :show]
-  end
+  get '/register/new', to: 'users#new', as: 'new_user'
+
+  # resources :users, only: [:create, :show, :edit, :update] do
+  # 	resources :orders, only: [:create, :show]
+  # end
+
+  post '/users/:user_id/orders', to: 'orders#create', as: 'user_orders'
+  get '/users/:user_id/orders/:id', to: 'orders#show', as: 'user_order'
+  post '/users', to: 'users#create', as: 'users'
+  get '/users/:id/edit', to: 'users#edit', as: 'edit_user'
+  get '/users/id', to: 'users#show', as: 'user'
+  patch '/users/:id', to: 'users#update'
+
+
 
   get '/profile', to: 'users#show', as: :profile
   get '/profile/orders', to: 'orders#index', as: :profile_orders
@@ -40,10 +72,16 @@ Rails.application.routes.draw do
     resources :items, only: [:new, :create, :edit, :update, :destroy]
 		resources :users
   end
+
   namespace :merchant_admins do
     resources :items, only: [:update, :new, :create]
     resources :orders, only: [:show, :update]
   end
+  # post 'merchant_admins/items', to: 'merchant_admins/items#create'
+
+
+
+
   patch '/admin/orders/:id', to: 'admin/orders#update', as: :ship_order
 
   namespace :admin do
